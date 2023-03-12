@@ -30,7 +30,7 @@ export const TodoList = (projectUuid) => {
         todoItems.push(tempTodo);
 
         if (isSessionStorageAvailable) {
-            addTodoItemToStorage(uuid, currentProjectUuid, todoItems);
+            addTodoItemToStorage(currentProjectUuid, uuid, todoItems);
         }
     }
 
@@ -38,7 +38,7 @@ export const TodoList = (projectUuid) => {
         todoItems = todoItems.filter((todoItem) => todoItem.uuid != todoItemUuid);
 
         if (isSessionStorageAvailable) {
-            removeTodoItemFromStorage(uuid, currentProjectUuid, todoItemUuid);
+            removeTodoItemFromStorage(currentProjectUuid, uuid,  todoItemUuid);
         }
     }
 

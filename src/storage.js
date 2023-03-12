@@ -23,28 +23,52 @@ export function isStorageAvailable(type) {
     }
 }
 
-export function addTodoItemToStorage(uuid, currentProjectUuid, todoItems) {
-    let tempProjectString = sessionStorage.getItem(currentProjectUuid);
+export function addTodoItemToStorage(projectUuid, todoListUuid, todoItems) {
+    let tempProjectString = sessionStorage.getItem(projectUuid);
     let tempProject = {};
 
     if (tempProjectString !== null) {
         tempProject = JSON.parse(tempProjectString);
     }
 
-    tempProject[uuid] = todoItems;
-    sessionStorage.setItem(currentProjectUuid, JSON.stringify(tempProject));
+    tempProject[todoListUuid] = todoItems;
+    sessionStorage.setItem(projectUuid, JSON.stringify(tempProject));
 }
 
-export function removeTodoItemFromStorage(uuid, currentProjectUuid, todoItemUuid) {
-    let tempProjectString = sessionStorage.getItem(currentProjectUuid);
+export function removeTodoItemFromStorage(projectUuid, todoListUuid, todoItemUuid) {
+    let tempProjectString = sessionStorage.getItem(projectUuid);
     let tempProject = {};
 
     if (tempProjectString !== null) {
         tempProject = JSON.parse(tempProjectString);
     }
 
-    let tempTodoItems = tempProject[uuid];
+    let tempTodoItems = tempProject[todoListUuid];
     tempTodoItems = tempTodoItems.filter((todoItem) => todoItem.uuid !== todoItemUuid);
-    tempProject[uuid] = tempTodoItems;
+    tempProject[todoListUuid] = tempTodoItems;
+    sessionStorage.setItem(projectUuid, JSON.stringify(tempProject));
+}
+
+export function addTodoListToStorage(projectUuid, todoListUuid) {
+    let tempProjectString = sessionStorage.getItem(projectUuid);
+    let tempProject = {};
+
+    if (tempProjectString !== null) {
+        tempProject = JSON.parse(tempProjectString);
+    }
+
+    tempProject[todoListUuid] = [];
+    sessionStorage.setItem(projectUuid, JSON.stringify(tempProject));
+}
+
+export function removeTodoListFromStorage(projectUuid, todoListUuid) {
+    let tempProjectString = sessionStorage.getItem(projectUuid);
+    let tempProject = {};
+
+    if (tempProjectString !== null) {
+        tempProject = JSON.parse(tempProjectString);
+    }
+
+    delete tempProject[todoListUuid];
     sessionStorage.setItem(currentProjectUuid, JSON.stringify(tempProject));
 }
