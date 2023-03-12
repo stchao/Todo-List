@@ -1,4 +1,41 @@
-export function isStorageAvailable(type) {
+export const Storage = (function() {
+    const _storageKey = 'todo-list-storage';
+    const _local = {};
+    const _isSessionStorageAvailable = isStorageAvailable('sessionStorage');
+
+    const getProject = () => _local;
+    const _setProject = () => {
+        if (_isSessionStorageAvailable) {
+            sessionStorage.setItem(_storageKey, JSON.stringify(_local));
+        }
+    }
+
+    const addTodo = (projectUuid, todoListUuid, todos) => {
+        _local[projectUuid][todoListUuid] = todos;
+        _setProject();
+    };
+
+    const removeTodo = (projectUuid, todoListUuid, todoUuid) => {
+        let tempTodos = _local[projectUuid][todoListUuid];
+        tempTodos = tempTodos.filter((todoItem) => todoItem.uuid !== todoUuid);
+        _local[projectUuid][todoListUuid] = tempTodos;
+        _setProject();
+    }
+
+    const addTodoList = (projectUuid, todoListUuid) => {
+        _local[projectUuid][todoListUuid] = [];
+        _setProject();
+    }
+
+    const removeTodoList = (projectUuid, todoListUuid) => {
+        delete _local[projectUuid][todoListUuid];
+        _setProject();
+    }
+
+    return { getProject, addTodo, removeTodo, addTodoList, removeTodoList };    
+})();
+
+function isStorageAvailable(type) {
     let storage;
     try {
         storage = window[type];
@@ -21,54 +58,4 @@ export function isStorageAvailable(type) {
             // acknowledge QuotaExceededError only if there's something already stored
             (storage && storage.length !== 0);
     }
-}
-
-export function addTodoItemToStorage(projectUuid, todoListUuid, todos) {
-    let tempProjectString = sessionStorage.getItem(projectUuid);
-    let tempProject = {};
-
-    if (tempProjectString !== null) {
-        tempProject = JSON.parse(tempProjectString);
-    }
-
-    tempProject[todoListUuid] = todos;
-    sessionStorage.setItem(projectUuid, JSON.stringify(tempProject));
-}
-
-export function removeTodoItemFromStorage(projectUuid, todoListUuid, todoUuid) {
-    let tempProjectString = sessionStorage.getItem(projectUuid);
-    let tempProject = {};
-
-    if (tempProjectString !== null) {
-        tempProject = JSON.parse(tempProjectString);
-    }
-
-    let tempTodoItems = tempProject[todoListUuid];
-    tempTodoItems = tempTodoItems.filter((todoItem) => todoItem.uuid !== todoUuid);
-    tempProject[todoListUuid] = tempTodoItems;
-    sessionStorage.setItem(projectUuid, JSON.stringify(tempProject));
-}
-
-export function addTodoListToStorage(projectUuid, todoListUuid) {
-    let tempProjectString = sessionStorage.getItem(projectUuid);
-    let tempProject = {};
-
-    if (tempProjectString !== null) {
-        tempProject = JSON.parse(tempProjectString);
-    }
-
-    tempProject[todoListUuid] = [];
-    sessionStorage.setItem(projectUuid, JSON.stringify(tempProject));
-}
-
-export function removeTodoListFromStorage(projectUuid, todoListUuid) {
-    let tempProjectString = sessionStorage.getItem(projectUuid);
-    let tempProject = {};
-
-    if (tempProjectString !== null) {
-        tempProject = JSON.parse(tempProjectString);
-    }
-
-    delete tempProject[todoListUuid];
-    sessionStorage.setItem(currentProjectUuid, JSON.stringify(tempProject));
 }
