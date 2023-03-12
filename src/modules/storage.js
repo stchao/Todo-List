@@ -23,7 +23,7 @@ export function isStorageAvailable(type) {
     }
 }
 
-export function addTodoItemToStorage(projectUuid, todoListUuid, todoItems) {
+export function addTodoItemToStorage(projectUuid, todoListUuid, todos) {
     let tempProjectString = sessionStorage.getItem(projectUuid);
     let tempProject = {};
 
@@ -31,11 +31,11 @@ export function addTodoItemToStorage(projectUuid, todoListUuid, todoItems) {
         tempProject = JSON.parse(tempProjectString);
     }
 
-    tempProject[todoListUuid] = todoItems;
+    tempProject[todoListUuid] = todos;
     sessionStorage.setItem(projectUuid, JSON.stringify(tempProject));
 }
 
-export function removeTodoItemFromStorage(projectUuid, todoListUuid, todoItemUuid) {
+export function removeTodoItemFromStorage(projectUuid, todoListUuid, todoUuid) {
     let tempProjectString = sessionStorage.getItem(projectUuid);
     let tempProject = {};
 
@@ -44,7 +44,7 @@ export function removeTodoItemFromStorage(projectUuid, todoListUuid, todoItemUui
     }
 
     let tempTodoItems = tempProject[todoListUuid];
-    tempTodoItems = tempTodoItems.filter((todoItem) => todoItem.uuid !== todoItemUuid);
+    tempTodoItems = tempTodoItems.filter((todoItem) => todoItem.uuid !== todoUuid);
     tempProject[todoListUuid] = tempTodoItems;
     sessionStorage.setItem(projectUuid, JSON.stringify(tempProject));
 }
