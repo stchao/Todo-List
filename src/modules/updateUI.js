@@ -22,19 +22,47 @@ export const createProject = (title = "default") => {
 
 export const getModals = () => {
     const modalFragment = document.createDocumentFragment();
-    const projectModalElement = getProjectModal();
-    const todoModalElement = getTodoModal();
+    const closeModalButton = document.createElement('button');
+    const allModalElements = getAllModalElements();
+    const todoModalElements = getTodoModalElements();
+    const createButton = document.createElement('button');
     
-    modalFragment.appendChild(projectModalElement);
-    modalFragment.appendChild(todoModalElement);
+    closeModalButton.type = 'button';
+    closeModalButton.classList.add('close-form-button');
+    closeModalButton.innerText = 'x';
+    closeModalButton.addEventListener('click', () => { toggleModal(); });
+
+    createButton.innerText = 'Create';
+    createButton.type = 'button';    
+
+    modalFragment.appendChild(closeModalButton);
+    modalFragment.appendChild(allModalElements);
+    modalFragment.appendChild(todoModalElements);
+    modalFragment.appendChild(createButton);
     return modalFragment;
+}
+
+export const toggleModal = (classToAdd = '') => {
+    const modalElement = document.querySelector('#modal');
+    const classesToToggle = [ 'new-todo', 'new-project' ];
+
+    modalElement.classList.toggle('d-none');
+    classesToToggle.forEach((classToToggle) => {
+        if (modalElement.classList.contains(classToToggle)) {
+            modalElement.classList.toggle(classToToggle);
+        }
+    })
+
+    if (classToAdd) {
+        modalElement.classList.add(classToAdd);
+    }
 }
 
 const formItemFactory = (label, attributes, isRequired = false) => {
     return { label, attributes, isRequired };
 }
 
-function getFormRow(formItem) {
+const getFormRow = (formItem) => {
     const rowElement = document.createElement('div');
     const labelElement = document.createElement('label');
     const textElement = document.createElement('input');
@@ -66,32 +94,22 @@ function getFormRow(formItem) {
     return rowElement;
 }
 
-const getProjectModal = () => {
+const getAllModalElements = () => {
     const titleRowAttributes = {
-        id: 'projectTitleInput',
-        name: 'project_title',
+        id: 'titleInput',
+        name: 'title',
         type: 'text',
         minlength: 1,
         maxlength: 200,
     };
 
     const titleItem = formItemFactory('TITLE:', titleRowAttributes, true);
-
     const titleRowElement = getFormRow(titleItem);
-    titleRowElement.classList.add('new-project');
     return titleRowElement;
 }
 
-const getTodoModal = () => {
+const getTodoModalElements = () => {
     const todoModalFragment = document.createDocumentFragment();
-
-    const titleRowAttributes = {
-        id: 'todoTitle',
-        name: 'todo_title',
-        type: 'text',
-        minlength: 1,
-        maxlength: 200,
-    };
 
     const descriptionRowAttributes = {
         id: 'todoDescription',
@@ -124,10 +142,9 @@ const getTodoModal = () => {
     };
 
     const formItems = [
-        formItemFactory('TITLE', titleRowAttributes, true),
-        formItemFactory('DESCRIPTION', descriptionRowAttributes),
-        formItemFactory('DUE DATE', dueDateRowAttributes),
-        formItemFactory('PRIORITY', priorityRowAttributes),
+        formItemFactory('DESCRIPTION:', descriptionRowAttributes),
+        formItemFactory('DUE DATE:', dueDateRowAttributes),
+        formItemFactory('PRIORITY:', priorityRowAttributes),
         formItemFactory('IS COMPLETED?', isCompletedRowAttributes)
     ];
 

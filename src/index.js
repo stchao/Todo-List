@@ -1,5 +1,5 @@
 import { Storage } from "./modules/storage";
-import { createProjectElement, createTodosElements, getModals } from "./modules/updateUI";
+import { createProjectElement, createTodosElements, getModals, toggleModal } from "./modules/updateUI";
 import githubIcon from "./images/github-logo-white.png";
 import plusIcon from "./images/plus-box.png";
 
@@ -22,6 +22,8 @@ const getSidebar = () => {
 
     imgIconElement.src = plusIcon;
     imgIconElement.classList.add('icon');
+    addButtonElement.id = 'addProjectButton'
+    addButtonElement.addEventListener('click', () => { toggleModal('new-project'); });
     addButtonElement.appendChild(imgIconElement);
     addButtonElement.appendChild(buttonTextElement);
 
@@ -30,9 +32,8 @@ const getSidebar = () => {
         const todosElement = createTodosElements(currentStorage[projectUuid]);
         projectElement.appendChild(projectItemElement);
         projectElement.appendChild(todosElement);
-    }
+    }    
     
-    addButtonElement.id = 'addProjectButton'
     projectElement.id = 'projectList'
     sidebarElement.id = 'sidebarContainer';
     sidebarElement.appendChild(addButtonElement);
@@ -51,6 +52,7 @@ const getMain = () => {
     imgIconElement.classList.add('icon');
 
     addButtonElement.id = 'addTodoButton'
+    addButtonElement.addEventListener('click', () => { toggleModal('new-todo'); });
     addButtonElement.appendChild(imgIconElement);
     addButtonElement.appendChild(buttonTextElement)
     mainElement.id = 'mainContainer';
@@ -96,17 +98,11 @@ const getFooter = () => {
 const getModal = () => {
     const modalElement = document.createElement('div');
     const formElement = document.createElement('form');
-    const closeModalButton = document.createElement('button');
     const modalElements = getModals();    
     
-    closeModalButton.id = 'closeModalButton';
-    closeModalButton.type = 'button';
-    closeModalButton.classList.add('close-form-button');
-    closeModalButton.innerText = 'x';
-
-    formElement.appendChild(closeModalButton);
     formElement.appendChild(modalElements);
 
+    modalElement.id = 'modal';
     modalElement.classList.add('modal');
     modalElement.classList.add('d-none');
     modalElement.appendChild(formElement);
