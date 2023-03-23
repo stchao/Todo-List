@@ -1,61 +1,52 @@
-export const createProjectElement = (currentProject) => {
+import { Storage } from "./storage";
+
+export const updateProjectUI = () => {
+    const currentStorage = Storage.get();
+    const projectFragment = document.createDocumentFragment();    
+
+    for (const projectUuid in currentStorage) {
+        const projectElement = createProjectElement(currentStorage[projectUuid]);
+        const todoElements = createTodoElements(currentStorage[projectUuid].todos);
+        projectFragment.appendChild(projectElement);
+        projectFragment.appendChild(todoElements);
+    }
+
+    const projectListElement = document.querySelector('#projectList');   
+    projectListElement.textContent = '';
+    projectListElement.appendChild(projectFragment);
+}
+
+export const updateTodoUI = () => {
+    const currentTodos = Storage.getActiveProjectTodos();  
+    const todoElements = createTodoElements(currentTodos);
+
+    const todos = document.querySelector('#todosContainer');   
+    todos.textContent = '';
+    todos.appendChild(todoElements);
+}
+
+export const getAddButtonElement = (classToAdd) => {
+    const addButtonElement = document.createElement('button');
+    addButtonElement.addEventListener('click', () => { toggleModal(classToAdd); });
+    return addButtonElement;
+}
+
+const createProjectElement = (currentProject) => {
     const projectItemElement = document.createElement('li');
     projectItemElement.innerText = currentProject.title;
     return projectItemElement;
 }
 
-export const createTodosElements = (currentProject) => {
+const createTodoElements = (todos) => {
     const todosElement = document.createElement('ul');
 
-    for (const todoUuid in currentProject.todos) {
+    for (const todoUuid in todos) {
         const todoElement = document.createElement('li');
-        todoElement.innerText = currentProject.todos[todoUuid].title;
+        todoElement.innerText = todos[todoUuid].title;
         todosElement.appendChild(todoElement);
     }
 
     return todosElement;
-}
-
-export const createProject = (title = "default") => {
-
-}
-
-export const getModals = () => {
-    const modalFragment = document.createDocumentFragment();
-    const closeModalButton = document.createElement('button');
-    const allModalElements = getAllModalElements();
-    const todoModalElements = getTodoModalElements();
-    const createButton = document.createElement('button');
-    
-    closeModalButton.type = 'button';
-    closeModalButton.classList.add('close-form-button');
-    closeModalButton.innerText = 'x';
-    closeModalButton.addEventListener('click', () => { toggleModal(); });
-
-    createButton.innerText = 'Create';
-    createButton.type = 'button';    
-
-    modalFragment.appendChild(closeModalButton);
-    modalFragment.appendChild(allModalElements);
-    modalFragment.appendChild(todoModalElements);
-    modalFragment.appendChild(createButton);
-    return modalFragment;
-}
-
-export const toggleModal = (classToAdd = '') => {
-    const modalElement = document.querySelector('#modal');
-    const classesToToggle = [ 'new-todo', 'new-project' ];
-
-    modalElement.classList.toggle('d-none');
-    classesToToggle.forEach((classToToggle) => {
-        if (modalElement.classList.contains(classToToggle)) {
-            modalElement.classList.toggle(classToToggle);
-        }
-    })
-
-    if (classToAdd) {
-        modalElement.classList.add(classToAdd);
-    }
 }
 
 const formItemFactory = (label, attributes, isRequired = false) => {
@@ -94,25 +85,11 @@ const getFormRow = (formItem) => {
     return rowElement;
 }
 
-const getAllModalElements = () => {
-    const titleRowAttributes = {
-        id: 'titleInput',
-        name: 'title',
-        type: 'text',
-        minlength: 1,
-        maxlength: 200,
-    };
-
-    const titleItem = formItemFactory('TITLE:', titleRowAttributes, true);
-    const titleRowElement = getFormRow(titleItem);
-    return titleRowElement;
-}
-
 const getTodoModalElements = () => {
     const todoModalFragment = document.createDocumentFragment();
 
     const descriptionRowAttributes = {
-        id: 'todoDescription',
+        id: 'todoDescriptionInput',
         name: 'todo_description',
         type: 'text',
         minlength: 1,
@@ -120,13 +97,13 @@ const getTodoModalElements = () => {
     };
 
     const dueDateRowAttributes = {
-        id: 'todoDueDate',
+        id: 'todoDueDateInput',
         name: 'todo_due_date',
         type: 'date',
     };
 
     const priorityRowAttributes = {
-        id: 'todoPriority',
+        id: 'todoPriorityInput',
         name: 'todo_description',
         type: 'number',
         title: 'Enter a number between -999 and 999',
@@ -136,7 +113,7 @@ const getTodoModalElements = () => {
     };
     
     const isCompletedRowAttributes = {
-        id: 'todoIsCompleted',
+        id: 'todoIsCompletedCheckbox',
         name: 'todo_is_completed',
         type: 'checkbox',
     };
@@ -155,4 +132,101 @@ const getTodoModalElements = () => {
     });
 
     return todoModalFragment;
+}
+
+const getAllModalElements = (classToAdd) => {
+    const modalFragment = document.createDocumentFragment();
+    const titleRowAttributes = {
+        id: 'titleInput',
+        name: 'title',
+        type: 'text',
+        minlength: 1,
+        maxlength: 200,
+    };
+
+    const titleItem = formItemFactory('TITLE:', titleRowAttributes, true);
+    const titleRowElement = getFormRow(titleItem);
+    modalFragment.appendChild(titleRowElement);
+
+    if (classToAdd === 'new-todo') {
+        const todoModalElements = getTodoModalElements();
+        modalFragment.appendChild(todoModalElements);
+    }
+
+    return modalFragment;
+}
+
+const getModals = (classToAdd) => {  
+    const modalElement = document.createElement('div');
+    const formElement = document.createElement('form');
+    const closeModalButton = document.createElement('button');
+    const allModalElements = getAllModalElements(classToAdd);
+    const createButton = document.createElement('button');
+    
+    closeModalButton.type = 'button';
+    closeModalButton.classList.add('close-form-button');
+    closeModalButton.innerText = 'x';
+    closeModalButton.addEventListener('click', () => { toggleModal(); });
+
+    createButton.type = 'button';
+    createButton.innerText = 'Create';
+    createButton.addEventListener('click', () => { createEntry(classToAdd); });
+
+    modalElement.id = 'modal';
+    modalElement.classList.add(classToAdd);
+
+    formElement.appendChild(closeModalButton);
+    formElement.appendChild(allModalElements);
+    formElement.appendChild(createButton);
+    modalElement.appendChild(formElement);
+
+    return modalElement;
+}
+
+const toggleModal = (classToAdd = '') => {
+    if (classToAdd) {
+        const modalElement = getModals(classToAdd);
+        modalElement.classList.add(classToAdd);
+
+        const containerElement = document.querySelector('#container');
+        containerElement.appendChild(modalElement);
+
+        return;
+    }    
+
+    const modalElement = document.querySelector('#modal');
+    modalElement.remove();
+}
+
+const createEntry = (classToAdd) => {
+    const titleElement = document.querySelector('#titleInput');
+
+    switch (classToAdd) {
+        case 'new-todo':
+            const descriptionElement = document.querySelector('#todoDescriptionInput');
+            const dueDateElement = document.querySelector('#todoDueDateInput');
+            const priorityElement = document.querySelector('#todoPriorityInput');
+            const isCompletedElement = document.querySelector('#todoIsCompletedCheckbox');
+
+            const tempTodo = Storage.addTodo();
+            tempTodo.title = titleElement.value;
+            tempTodo.description = descriptionElement.value;
+            tempTodo.dueDate = dueDateElement.value;
+            tempTodo.priority = priorityElement.value;
+            tempTodo.isCompleted = isCompletedElement.checked;
+
+            Storage.updateTodo(tempTodo);            
+            break;
+        case 'new-project':
+            const tempProject = Storage.addProject();
+            tempProject.title = titleElement.value;
+            Storage.updateProjectTitle(tempProject);
+            break;
+        default:
+            break;
+    }
+
+    updateProjectUI();
+    updateTodoUI();    
+    toggleModal();
 }

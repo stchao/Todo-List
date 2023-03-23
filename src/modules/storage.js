@@ -5,8 +5,12 @@ export const Storage = (function() {
     const _storageKey = 'todo-list-storage';    
     const _isSessionStorageAvailable = isStorageAvailable('sessionStorage');
     let _local = {};
+    let _activeProject = '';
+    let _defaultUuid = '';
 
     const get = () => _local;
+
+    const getActiveProjectTodos = () => _local[_activeProject].todos;
     
     const _set = () => {
         if (_isSessionStorageAvailable) {
@@ -14,22 +18,38 @@ export const Storage = (function() {
         }
     }
 
-    const addTodo = (projectUuid) => {
+    const setActiveProject = (uuid = '') => {
+        _activeProject = uuid || _defaultUuid;
+    }
+
+    const addTodo = () => {
         let tempTodo = Todo();
-        _local[projectUuid].todos[tempTodo.uuid] = tempTodo;
+        _local[_activeProject].todos[tempTodo.uuid] = tempTodo;
         _set();
+        return tempTodo;
     };
 
-    const removeTodo = (projectUuid, todoUuid) => {
-        let tempTodos = _local[projectUuid].todos;
+    const updateTodo = (todo) => {
+        _local[_activeProject].todos[todo.uuid] = todo;
+        _set();
+    }
+
+    const removeTodo = (todoUuid) => {
+        let tempTodos = _local[_activeProject].todos;
         tempTodos = tempTodos.filter((todoItem) => todoItem.uuid !== todoUuid);
-        _local[projectUuid].todos = tempTodos;
+        _local[_activeProject].todos = tempTodos;
         _set();
     }
 
     const addProject = () => {
         const tempProject = Project();
         _local[tempProject.uuid] = tempProject;
+        _set();
+        return tempProject;
+    }
+
+    const updateProjectTitle = (project) => {
+        _local[project.uuid].title = project.title;
         _set();
     }
 
@@ -49,16 +69,25 @@ export const Storage = (function() {
         const tempProject = Project('default');
         return { [tempProject.uuid]: tempProject } ;
     }
-
     // Load initial data from session storage
     (function _loadInitialDataFromSession() {
         if (_isSessionStorageAvailable) {
             const tempStorageString = sessionStorage.getItem(_storageKey) ?? '{}';
-            _local = _loadDefaultData(tempStorageString);
+            _local = _loadDefaultData(tempStorageString);            
+            _set();
+
+            for (const projectUuid in _local) {
+                if (_local[projectUuid].title === 'default') {
+                    _defaultUuid = projectUuid;
+                    break;
+                }
+            }
+            
+            setActiveProject();
         }
     })();
 
-    return { get, addTodo, removeTodo, addProject, removeProject };    
+    return { get, getActiveProjectTodos, setActiveProject, addTodo, updateTodo, removeTodo, addProject, updateProjectTitle, removeProject };    
 })();
 
 function isStorageAvailable(type) {
