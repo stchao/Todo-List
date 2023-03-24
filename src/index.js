@@ -1,4 +1,4 @@
-import { updateProjectUI, updateTodoUI, getAddButtonElement } from "./modules/updateUI";
+import { UI } from "./modules/updateUI";
 import githubIcon from "./images/github-logo-white.png";
 import plusIcon from "./images/plus-box.png";
 
@@ -17,40 +17,43 @@ const getSidebar = () => {
     imgIconElement.src = plusIcon;
     imgIconElement.classList.add('icon');
 
-    const buttonTextElement = document.createTextNode('Project');
-    const addButtonElement = getAddButtonElement('new-project');
-    addButtonElement.id = 'addProjectButton'
-    addButtonElement.appendChild(imgIconElement);
-    addButtonElement.appendChild(buttonTextElement);
+    const projectTextElement = document.createTextNode('Project');
+    const addProjectButtonElement = UI.getAddButtonElement('new-project');
+    addProjectButtonElement.appendChild(imgIconElement);
+    addProjectButtonElement.appendChild(projectTextElement);
 
-    const projectElement = document.createElement('ul');
-    projectElement.id = 'projectList'
+    const todoTextElement = document.createTextNode('Todo');
+    const addTodoButtonElement = UI.getAddButtonElement('new-todo');
+    addTodoButtonElement.appendChild(imgIconElement.cloneNode(true));
+    addTodoButtonElement.appendChild(todoTextElement);  
+
+    const addButtonsContainer = document.createElement('div');
+    addButtonsContainer.classList.add('add-buttons-container');
+    addButtonsContainer.appendChild(addProjectButtonElement);
+    addButtonsContainer.appendChild(addTodoButtonElement);
+
+    const projectLabelElement = document.createElement('label');
+    projectLabelElement.innerText = 'Projects:';
+    projectLabelElement.classList.add('project-font');
+
+    const projectElement = document.createElement('div');
+    projectElement.id = 'projectList';
 
     const sidebarElement = document.createElement('div');
     sidebarElement.id = 'sidebarContainer';
-    sidebarElement.appendChild(addButtonElement);
+    sidebarElement.appendChild(addButtonsContainer);
+    sidebarElement.appendChild(projectLabelElement);
     sidebarElement.appendChild(projectElement);
 
     return sidebarElement;
 }
 
-const getMain = () => {
-    const imgIconElement = document.createElement('img');
-    imgIconElement.src = plusIcon;
-    imgIconElement.classList.add('icon');
-
-    const buttonTextElement = document.createTextNode('Todo');
-    const addButtonElement = getAddButtonElement('new-todo');
-    addButtonElement.id = 'addTodoButton'
-    addButtonElement.appendChild(imgIconElement);
-    addButtonElement.appendChild(buttonTextElement);    
-
+const getMain = () => {  
     const todoElements = document.createElement('div');
     todoElements.id = 'todosContainer';
 
     const mainElement = document.createElement('div');
-    mainElement.id = 'mainContainer';    
-    mainElement.appendChild(addButtonElement);
+    mainElement.id = 'mainContainer';
     mainElement.appendChild(todoElements);
 
     return mainElement;
@@ -102,7 +105,7 @@ const getFooter = () => {
     bodyFragment.appendChild(footer);
     body.appendChild(bodyFragment);
 
-    updateProjectUI();
-    updateTodoUI();
+    UI.setProjectUI();
+    UI.setTodoUI();
 })();
 

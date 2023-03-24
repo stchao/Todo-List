@@ -1,43 +1,43 @@
 import { Todo } from "./todo";
 import { Project } from "./project";
 
-export const Storage = (function() {
+export const Storage = (() => {
     const _storageKey = 'todo-list-storage';    
     const _isSessionStorageAvailable = isStorageAvailable('sessionStorage');
     let _local = {};
-    let _activeProject = '';
+    let _activeProjectUuid = '';
     let _defaultUuid = '';
 
-    const get = () => _local;
-
-    const getActiveProjectTodos = () => _local[_activeProject].todos;
-    
     const _set = () => {
         if (_isSessionStorageAvailable) {
             sessionStorage.setItem(_storageKey, JSON.stringify(_local));
         }
     }
 
+    const get = () => _local;
+
+    const getActiveProject = (getUuid = false) => getUuid ? _activeProjectUuid : _local[_activeProjectUuid];
+
     const setActiveProject = (uuid = '') => {
-        _activeProject = uuid || _defaultUuid;
-    }
+        _activeProjectUuid = uuid || _defaultUuid;
+    }  
 
     const addTodo = () => {
         let tempTodo = Todo();
-        _local[_activeProject].todos[tempTodo.uuid] = tempTodo;
+        _local[_activeProjectUuid].todos[tempTodo.uuid] = tempTodo;
         _set();
         return tempTodo;
     };
 
     const updateTodo = (todo) => {
-        _local[_activeProject].todos[todo.uuid] = todo;
+        _local[_activeProjectUuid].todos[todo.uuid] = todo;
         _set();
     }
 
     const removeTodo = (todoUuid) => {
-        let tempTodos = _local[_activeProject].todos;
+        let tempTodos = _local[_activeProjectUuid].todos;
         tempTodos = tempTodos.filter((todoItem) => todoItem.uuid !== todoUuid);
-        _local[_activeProject].todos = tempTodos;
+        _local[_activeProjectUuid].todos = tempTodos;
         _set();
     }
 
@@ -87,7 +87,7 @@ export const Storage = (function() {
         }
     })();
 
-    return { get, getActiveProjectTodos, setActiveProject, addTodo, updateTodo, removeTodo, addProject, updateProjectTitle, removeProject };    
+    return { get, getActiveProject, setActiveProject, addTodo, updateTodo, removeTodo, addProject, updateProjectTitle, removeProject };    
 })();
 
 function isStorageAvailable(type) {

@@ -1,52 +1,101 @@
 import { Storage } from "./storage";
 
-export const updateProjectUI = () => {
-    const currentStorage = Storage.get();
-    const projectFragment = document.createDocumentFragment();    
-
-    for (const projectUuid in currentStorage) {
-        const projectElement = createProjectElement(currentStorage[projectUuid]);
-        const todoElements = createTodoElements(currentStorage[projectUuid].todos);
-        projectFragment.appendChild(projectElement);
-        projectFragment.appendChild(todoElements);
+export const UI = (() => {
+    const _setActiveProject = (ev, projectUuid) => {
+        Storage.setActiveProject(projectUuid);
+        const siblings = [...ev.target.parentElement.children];
+        siblings.forEach((sibling) => sibling.classList.remove('active'));
+        ev.target.classList.add('active');
+        setTodoUI();
     }
 
-    const projectListElement = document.querySelector('#projectList');   
-    projectListElement.textContent = '';
-    projectListElement.appendChild(projectFragment);
-}
+    const setProjectUI = () => {
+        const currentStorage = Storage.get();
+        const currentProject = Storage.getActiveProject(true);
+        const projectFragment = document.createDocumentFragment();    
+    
+        for (const projectUuid in currentStorage) {
+            const projectButtonElement = document.createElement('button');
+            projectButtonElement.innerText = currentStorage[projectUuid].title;
+            projectButtonElement.classList.add('add-button', 'project-font');
 
-export const updateTodoUI = () => {
-    const currentTodos = Storage.getActiveProjectTodos();  
-    const todoElements = createTodoElements(currentTodos);
+            if (currentProject === projectUuid) {
+                projectButtonElement.classList.add('active');
+            }
 
-    const todos = document.querySelector('#todosContainer');   
-    todos.textContent = '';
-    todos.appendChild(todoElements);
-}
+            projectButtonElement.addEventListener('click', (ev) => { _setActiveProject(ev, projectUuid) });
+            projectFragment.appendChild(projectButtonElement);
+        }
+    
+        const projectListElement = document.querySelector('#projectList');   
+        projectListElement.textContent = '';
+        projectListElement.appendChild(projectFragment);
+    }
 
-export const getAddButtonElement = (classToAdd) => {
-    const addButtonElement = document.createElement('button');
-    addButtonElement.addEventListener('click', () => { toggleModal(classToAdd); });
-    return addButtonElement;
-}
+    const setTodoUI = () => {
+        const currentProject = Storage.getActiveProject();  
+        const todoElements = createTodoElements(currentProject.todos);
+    
+        const todos = document.querySelector('#todosContainer');   
+        todos.textContent = '';
+        todos.appendChild(todoElements);
+    }
 
-const createProjectElement = (currentProject) => {
-    const projectItemElement = document.createElement('li');
-    projectItemElement.innerText = currentProject.title;
-    return projectItemElement;
-}
+    const getAddButtonElement = (classToAdd) => {
+        const addButtonElement = document.createElement('button');
+        addButtonElement.classList.add('add-button');
+        addButtonElement.addEventListener('click', () => { toggleModal(classToAdd); });
+        return addButtonElement;
+    }
+
+    return { setProjectUI, setTodoUI, getAddButtonElement } 
+})();
 
 const createTodoElements = (todos) => {
-    const todosElement = document.createElement('ul');
+    const todosFragment = document.createDocumentFragment();    
 
     for (const todoUuid in todos) {
-        const todoElement = document.createElement('li');
-        todoElement.innerText = todos[todoUuid].title;
-        todosElement.appendChild(todoElement);
+        const todoButton = document.createElement('button');
+        todoButton.type = 'button';
+        todoButton.classList.add('collapsible');
+        todoButton.addEventListener('click', toggleContent);
+        todoButton.innerText = todos[todoUuid].title;
+
+        const todoDetails = document.createElement('ul');
+
+        for (const todoProperty in todos[todoUuid]) {
+            if (todoProperty === 'uuid') {
+                continue;
+            }
+
+            const todoDetail = document.createElement('li');
+            todoDetail.innerText = `${todoProperty.toUpperCase()}: ${todos[todoUuid][todoProperty]}`;
+            todoDetails.appendChild(todoDetail);
+        }
+
+        const todoContent = document.createElement('div');
+        todoContent.classList.add('todo-content');
+        todoContent.appendChild(todoDetails);
+
+        todosFragment.appendChild(todoButton);
+        todosFragment.appendChild(todoContent);
     }
 
-    return todosElement;
+    return todosFragment;
+}
+
+const toggleContent = (ev) => {
+    ev.target.classList.toggle('active');
+    const content = ev.target.nextElementSibling;
+
+    if (content.style.maxHeight) {
+        content.style.maxHeight = null;
+        content.style.borderWidth = 0;
+    }
+    else {
+        content.style.maxHeight = content.scrollHeight + "px";
+        content.style.borderWidth = '1.5px';
+    }
 }
 
 const formItemFactory = (label, attributes, isRequired = false) => {
@@ -226,7 +275,7 @@ const createEntry = (classToAdd) => {
             break;
     }
 
-    updateProjectUI();
-    updateTodoUI();    
+    UI.setProjectUI();
+    UI.setTodoUI();    
     toggleModal();
 }
