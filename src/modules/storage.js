@@ -36,7 +36,7 @@ export const Storage = (() => {
 
     const removeTodo = (todoUuid) => {
         let tempTodos = _local[_activeProjectUuid].todos;
-        tempTodos = tempTodos.filter((todoItem) => todoItem.uuid !== todoUuid);
+        delete tempTodos[todoUuid];
         _local[_activeProjectUuid].todos = tempTodos;
         _set();
     }

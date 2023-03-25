@@ -1,4 +1,6 @@
 import { Storage } from "./storage";
+import editIcon from "../images/pencil.png";
+import deleteIcon from "../images/delete.png";
 
 export const UI = (() => {
     const _setActiveProject = (ev, projectUuid) => {
@@ -54,15 +56,29 @@ export const UI = (() => {
 const createTodoElements = (todos) => {
     const todosFragment = document.createDocumentFragment();    
 
-    for (const todoUuid in todos) {
+    for (const todoUuid in todos) {       
+        const editTodoElement = document.createElement('a');
+        const editImgIcon = document.createElement('img');
+        editImgIcon.src = editIcon;
+        editImgIcon.classList.add('icon');
+        editTodoElement.appendChild(editImgIcon);        
+
+        const deleteTodoElement = document.createElement('a');
+        const deleteImgIcon = document.createElement('img');
+        deleteImgIcon.src = deleteIcon;
+        deleteImgIcon.classList.add('icon');
+        deleteTodoElement.appendChild(deleteImgIcon);
+        deleteTodoElement.addEventListener('click', () => { Storage.removeTodo(todoUuid); UI.setTodoUI(); });
+
         const todoButton = document.createElement('button');
         todoButton.type = 'button';
-        todoButton.classList.add('collapsible');
+        todoButton.classList.add('collapsible', 'todo-font');
         todoButton.addEventListener('click', toggleContent);
         todoButton.innerText = todos[todoUuid].title;
+        todoButton.appendChild(editTodoElement);
+        todoButton.appendChild(deleteTodoElement);
 
         const todoDetails = document.createElement('ul');
-
         for (const todoProperty in todos[todoUuid]) {
             if (todoProperty === 'uuid') {
                 continue;
@@ -85,6 +101,10 @@ const createTodoElements = (todos) => {
 }
 
 const toggleContent = (ev) => {
+    if (ev.target.tagName !== 'BUTTON') {
+        return;
+    }
+
     ev.target.classList.toggle('active');
     const content = ev.target.nextElementSibling;
 
