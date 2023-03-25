@@ -76,7 +76,10 @@ body {
 }
 
 .collapsible {
+    display: flex;
+    align-items: center;
     background-color: #ededed;
+    height: 60px;
     width: 100%;
     cursor: pointer;
     padding: 16px;
@@ -99,6 +102,19 @@ button.collapsible::before {
 
 button.collapsible.active::before {
     content: '\2212';
+}
+
+button.collapsible > a:first-child {
+    margin-left: auto;
+}
+
+.todo-font {
+    font-size: large;
+    font-weight: bold;
+}
+
+a:hover > img {
+    height: 1.5rem;
 }
 
 .todo-content {
