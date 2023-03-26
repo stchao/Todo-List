@@ -6,14 +6,14 @@ export const Priority = {
     High: 3
 }
 
-export const Todo = (title = '', description = '', dueDate = new Date(), priority = Priority.Low, lastModifiedDate = new Date(), isCompleted = false, currentUuid = '') => {   
+export const Todo = (title = '', description = '', dueDate = new Date(), priority = Priority.Low, isCompleted = false, currentUuid = '') => {   
     return { 
         uuid: currentUuid || uuidv4(), 
-        Title: title, 
-        Description: description, 
-        ['Due Date']: dueDate, 
-        Priority: priority, 
-        ['Last Modified Date']: lastModifiedDate, 
+        title, 
+        description, 
+        dueDate, 
+        priority, 
+        lastModifiedInMS: Date.now(), 
         isCompleted 
     };
 }

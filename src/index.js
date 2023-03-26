@@ -1,6 +1,6 @@
 import { UI } from "./modules/updateUI";
 import githubIcon from "./images/github-logo-white.png";
-import plusIcon from "./images/plus-box.png";
+import plusIcon from "./images/plus.png";
 
 const getHeader = () => {
     const headingElement = document.createElement('h1');

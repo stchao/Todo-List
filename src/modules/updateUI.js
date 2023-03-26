@@ -1,6 +1,7 @@
 import { Storage } from "./storage";
 import editIcon from "../images/pencil.png";
 import deleteIcon from "../images/delete.png";
+import { formatDistanceToNow } from "date-fns";
 
 export const UI = (() => {
     const _setActiveProject = (ev, projectUuid) => {
@@ -90,33 +91,49 @@ export const UI = (() => {
 const createTodoElements = (todos) => {
     const todosFragment = document.createDocumentFragment();    
 
-    for (const todoUuid in todos) {       
-        const todoDetails = document.createElement('ul');
-        for (const todoProperty in todos[todoUuid]) {
-            if (todoProperty === 'uuid') {
-                continue;
-            }
+    for (const todoUuid in todos) {
+        const descriptionLabel = document.createElement('span');
+        descriptionLabel.innerText = 'Description:';
+        descriptionLabel.classList.add('todo-description-label');
 
-            const todoDetail = document.createElement('li');
-            todoDetail.innerText = `${todoProperty}: ${todos[todoUuid][todoProperty]}`;
-            todoDetails.appendChild(todoDetail);
-        }
+        const description = document.createElement('span');
+        description.innerText = `${todos[todoUuid].description}`;
+        description.classList.add('todo-description');
+        
+        const priority = document.createElement('span');
+        priority.innerText = `Priority: ${todos[todoUuid].priority}`;
+        priority.classList.add('todo-priority');
+
+        const lastModified = document.createElement('span');
+        const distanceToNow = formatDistanceToNow(new Date(todos[todoUuid].lastModifiedInMS));
+        lastModified.innerText = `Last Updated: ${distanceToNow} ago`;
+        lastModified.classList.add('todo-last-modified');
 
         const todoContent = document.createElement('div');
         todoContent.classList.add('todo-content', 'hidden-todo-content');
-        todoContent.appendChild(todoDetails);
+        todoContent.appendChild(descriptionLabel);
+        todoContent.appendChild(priority);
+        todoContent.appendChild(description);
+        todoContent.appendChild(lastModified);
         
         const todoButton = document.createElement('button');
         todoButton.type = 'button';
         todoButton.classList.add('collapsible', 'todo-font');
-        todoButton.addEventListener('click', (ev) => { toggleContent(ev, todoContent); });
+        todoButton.addEventListener('click', (ev) => { 
+            const distanceToNow = formatDistanceToNow(new Date(todos[todoUuid].lastModifiedInMS));
+            lastModified.innerText = `Last Updated: ${distanceToNow} ago`;
+            toggleContent(ev, todoContent); 
+        });
 
         const completedElement = document.createElement('input');
         completedElement.type = 'checkbox'
         completedElement.checked = todos[todoUuid].isCompleted;
+        completedElement.addEventListener('click', (ev) => { 
+            doAction('update-todo', todoUuid, { isCompleted: ev.target.checked });
+        });
 
         const todoTitleElement = document.createElement('span');
-        todoTitleElement.innerText = todos[todoUuid].Title;
+        todoTitleElement.innerText = todos[todoUuid].title;
         todoTitleElement.classList.add('button-text');
 
         const editTodoElement = UI.getClickableIconElement(editIcon);
@@ -128,7 +145,8 @@ const createTodoElements = (todos) => {
         });
 
         const dueDateElement = document.createElement('span');
-        dueDateElement.innerText = `Due: ${todos[todoUuid]['Due Date']}`;        
+        const dueDate = todos[todoUuid].dueDate || 'N/A';
+        dueDateElement.innerText = `Due: ${dueDate}`;        
 
         const todoActionContainer = document.createElement('div');
         todoActionContainer.classList.add('todo-action-container');
@@ -152,7 +170,8 @@ const toggleContent = (ev, contentElement) => {
         targetElement = targetElement.parentElement;
     }
 
-    if (targetElement.id || ev.target.tagName === 'IMG' || !contentElement) {
+    if (targetElement.id || !contentElement || 
+        ev.target.tagName === 'IMG' || ev.target.tagName === 'INPUT') {
         return;
     }
 
@@ -167,14 +186,14 @@ const toggleContent = (ev, contentElement) => {
     }
 }
 
-const formItemFactory = (label, attributes, isRequired = false) => {
-    return { label, attributes, isRequired };
+const formItemFactory = (label, tagName, attributes, isRequired = false) => {
+    return { label, tagName, attributes, isRequired };
 }
 
 const getFormRow = (formItem) => {
     const rowElement = document.createElement('div');
     const labelElement = document.createElement('label');
-    const textElement = document.createElement('input');
+    const textElement = document.createElement(formItem.tagName ?? 'input');
 
     labelElement.innerText = formItem.label;
     labelElement.setAttribute('for', formItem.attributes.id);  
@@ -221,13 +240,9 @@ const getTodoModalElements = (selectedTodo = null) => {
     };
 
     const priorityRowAttributes = {
-        id: 'todoPriorityInput',
+        id: 'todoPrioritySelect',
         name: 'todo_description',
-        type: 'number',
-        title: 'Enter a number between -999 and 999',
-        value: 0,
-        max: 999,
-        min: -999
+        value: 0
     };
     
     const isCompletedRowAttributes = {
@@ -237,17 +252,17 @@ const getTodoModalElements = (selectedTodo = null) => {
     };
 
     if (selectedTodo) {
-        descriptionRowAttributes.value = selectedTodo.Description;
-        dueDateRowAttributes.value = selectedTodo['Due Date'];
-        priorityRowAttributes.value = selectedTodo.Priority;
+        descriptionRowAttributes.value = selectedTodo.description;
+        dueDateRowAttributes.value = selectedTodo.dueDate;
+        priorityRowAttributes.value = selectedTodo.priority;
         isCompletedRowAttributes.value = selectedTodo.isCompleted;
     }
 
     const formItems = [
-        formItemFactory('DESCRIPTION:', descriptionRowAttributes),
-        formItemFactory('DUE DATE:', dueDateRowAttributes),
-        formItemFactory('PRIORITY:', priorityRowAttributes),
-        formItemFactory('IS COMPLETED?', isCompletedRowAttributes)
+        formItemFactory('Description', 'textarea', descriptionRowAttributes),
+        formItemFactory('Due Date', 'input', dueDateRowAttributes),
+        formItemFactory('Priority', 'select', priorityRowAttributes),
+        formItemFactory('Completed', 'input', isCompletedRowAttributes)
     ];
 
     formItems.forEach((formItem) => {
@@ -275,10 +290,10 @@ const getAllModalElements = (classToAdd, uuid = '') => {
         type: 'text',
         minlength: 1,
         maxlength: 200,
-        value: selectedProject?.title || selectedTodo?.Title || '',
+        value: selectedProject?.title || selectedTodo?.title || '',
     };   
 
-    const titleItem = formItemFactory('TITLE:', titleRowAttributes, true);
+    const titleItem = formItemFactory('Title:', titleRowAttributes);
     const titleRowElement = getFormRow(titleItem);
     modalFragment.appendChild(titleRowElement);
 
@@ -304,7 +319,7 @@ const getModals = (classToAdd, uuid = '') => {
 
     createButton.type = 'button';
     createButton.innerText = uuid ? 'Update' : 'Create';
-    createButton.addEventListener('click', () => { createUpdateEntry(classToAdd, uuid); });
+    createButton.addEventListener('click', () => { doAction(classToAdd, uuid); });
 
     modalElement.id = 'modal';
     modalElement.classList.add(classToAdd);
@@ -329,54 +344,57 @@ const toggleModal = (classToAdd = '', uuid = '') => {
     }    
 
     const modalElement = document.querySelector('#modal');
-    modalElement.remove();
+    modalElement?.remove();
 }
 
-const createUpdateEntry = (classToAdd, uuid = '') => {
+const doAction = (action, uuid = '', customObject = null) => {
     const currentProject = Storage.getActiveProject();
-    const titleElement = document.querySelector('#titleInput');
-    const descriptionElement = document.querySelector('#todoDescriptionInput');
-    const dueDateElement = document.querySelector('#todoDueDateInput');
-    const priorityElement = document.querySelector('#todoPriorityInput');
-    const isCompletedElement = document.querySelector('#todoIsCompletedCheckbox');
+    const title = document.querySelector('#titleInput')?.value || customObject?.title;
+    const description = document.querySelector('#todoDescriptionInput')?.value || customObject?.description;
+    const dueDate = document.querySelector('#todoDueDateInput')?.value || customObject?.dueDate;
+    const priority = document.querySelector('#todoPriorityInput')?.value || customObject?.priority;
+    const isCompleted = document.querySelector('#todoIsCompletedCheckbox')?.checked || customObject?.isCompleted;
 
-    switch (classToAdd) {
+    switch (action) {
         case 'new-todo':           
             const tempTodo = Storage.addTodo();
-            tempTodo.Title = titleElement.value;
-            tempTodo.Description = descriptionElement.value;
-            tempTodo['Due Date'] = dueDateElement.value;
-            tempTodo.Priority = priorityElement.value;
-            tempTodo.isCompleted = isCompletedElement.checked;
+            tempTodo.title = title || new Date().toLocaleString();
+            tempTodo.description = description || '';
+            tempTodo.dueDate = dueDate || '';
+            tempTodo.priority = priority || 0;
+            tempTodo.isCompleted = isCompleted || false;
 
             Storage.updateTodo(tempTodo);            
             break;
         case 'update-todo':
             const currentTodo = currentProject.todos[uuid];
-            currentTodo.Title = titleElement.value;
-            currentTodo.Description = descriptionElement.value;
-            currentTodo['Due Date'] = dueDateElement.value;
-            currentTodo.Priority = priorityElement.value;
-            currentTodo.isCompleted = isCompletedElement.checked;
-            currentTodo['Last Modified Date'] = new Date();
+            currentTodo.title = title || currentTodo.title;
+            currentTodo.description = description || currentTodo.description;
+            currentTodo.dueDate = dueDate || currentTodo.dueDate;
+            currentTodo.priority = priority || currentTodo.priority;
+            currentTodo.isCompleted = isCompleted !== null ? isCompleted : currentTodo.isCompleted;
+            currentTodo.lastModifiedInMS = Date.now();
 
             Storage.updateTodo(currentTodo);
             break;
         case 'new-project':
             const tempProject = Storage.addProject();
-            tempProject.title = titleElement.value;
+            tempProject.title = title || new Date().toLocaleString();
             Storage.updateProjectTitle(tempProject);
             break;
         case 'update-project':
             const selectedProject = Storage.get()[uuid];
-            selectedProject.title = titleElement.value;
+            selectedProject.title = title || selectedProject.title;
             Storage.updateProjectTitle(selectedProject);
             break;
         default:
             break;
     }
 
-    UI.setProjectUI();
-    UI.setTodoUI();    
+    if (!customObject) {
+        UI.setProjectUI();
+        UI.setTodoUI();  
+    }
+
     toggleModal();
 }
