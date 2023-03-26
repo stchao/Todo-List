@@ -9,11 +9,11 @@ export const Priority = {
 export const Todo = (title = '', description = '', dueDate = new Date(), priority = Priority.Low, lastModifiedDate = new Date(), isCompleted = false, currentUuid = '') => {   
     return { 
         uuid: currentUuid || uuidv4(), 
-        title, 
-        description, 
-        dueDate, 
-        priority, 
-        lastModifiedDate, 
+        Title: title, 
+        Description: description, 
+        ['Due Date']: dueDate, 
+        Priority: priority, 
+        ['Last Modified Date']: lastModifiedDate, 
         isCompleted 
     };
 }

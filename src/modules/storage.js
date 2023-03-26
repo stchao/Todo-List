@@ -53,8 +53,8 @@ export const Storage = (() => {
         _set();
     }
 
-    const removeProject = (project) => {
-        delete _local[project.uuid];
+    const removeProject = (projectUuid) => {
+        delete _local[projectUuid];
         _set();
     }
 
@@ -66,7 +66,7 @@ export const Storage = (() => {
             return tempStorage;
         }
         
-        const tempProject = Project('default');
+        const tempProject = Project('Default');
         return { [tempProject.uuid]: tempProject } ;
     }
     // Load initial data from session storage
@@ -77,12 +77,12 @@ export const Storage = (() => {
             _set();
 
             for (const projectUuid in _local) {
-                if (_local[projectUuid].title === 'default') {
+                if (_local[projectUuid].title === 'Default') {
                     _defaultUuid = projectUuid;
                     break;
                 }
             }
-            
+
             setActiveProject();
         }
     })();
