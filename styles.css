@@ -1,291 +1,318 @@
-html, body {    
-    height: 100%
+:root {
+	--color-primary: #b3b3b3;
+	--color-secondary: #ededed;
+	--color-tertiary: #f9f9f9;
+	--standard-border: solid 2px var(--color-primary);
+	--spacing: 0.625rem;
+	--spacing-half: 0.3125rem;
+	--height: 2.5rem;
+	--icon-height-min: 1.25rem;
+	--icon-width-min: 1.25rem;
+	--icon-height-max: 1.75rem;
+	--icon-width-max: 1.75rem;
+}
+
+/* Main containers css */
+html,
+body {
+	height: 100%;
 }
 
 body {
-    margin: 0;
-    display: flex;
-    flex-direction: column;
+	display: flex;
+	flex-direction: column;
+	margin: 0;
 }
 
-#header {
-    text-align: center;
-    padding: 1rem;
-    background-color: black;
-    color: #f9f9f9;
-}
-
-#header h1 {
-    margin: 0;
+header {
+	text-align: center;
+	background-color: var(--color-primary);
 }
 
 #content {
-    flex: 1;
-    display: flex;
-    overflow: hidden;
+	display: flex;
+	flex: 1;
+	overflow: hidden;
 }
 
 #sidebarContainer {
-    background-color: #ededed;
-    width: max(150px, 20%);
-    padding: 10px;
-    padding-top: 0;
-    overflow: auto;
-}
-
-#sidebarContainer > ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-}
-
-.add-buttons-container {
-    background-color: inherit;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    padding: 10px 0px;
-    position: sticky;
-    top: 0px;
-}
-
-.add-button {
-    flex: 1 1 100px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    background-color: #ededed;
-    border: solid 2px #b3b3b3;
-    border-radius: 3px;    
-    font-weight: bold;
-    padding: 6px;
-}
-
-.project-button {
-    display: grid;
-    grid-template-columns: 1fr 1.75rem 1.75rem;
-    width: 100%;
-    background-color: #ededed;
-    border: solid 2px #b3b3b3;
-    border-radius: 3px;
-    justify-items: start;
-    align-items: center;   
-}
-
-.project-button:first-child {
-    grid-template-columns: 1fr;
-}
-
-.add-button:hover,
-.collapsible:hover,
-.project-button:hover, 
-.active
-{
-    background-color: #b3b3b3 !important;
-    cursor: pointer;
-}
-
-.project-font {
-    font-size: x-large;
-    font-weight: bold;
-    margin-bottom: 10px;
-    height: 50px;
-}
-
-.button-text {
-    white-space: nowrap;
-    max-width: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
+	background-color: var(--color-secondary);
+	width: max(150px, 20%);
+	display: flex;
+	flex-direction: column;
 }
 
 #mainContainer {
-    flex: 4;
-    background-color: #f9f9f9;
-    padding: 1rem;
-    overflow-y: auto;
+	flex: 4;
+	background-color: var(--color-tertiary);
+	padding: var(--spacing);
+	overflow-y: auto;
+	scroll-snap-type: y mandatory;
+	scroll-padding-top: var(--spacing);
 }
 
-.collapsible {
-    display: grid;
-    grid-template-columns: 1.5rem 3fr 14rem 1.5rem;
-    grid-template-rows: 40px;
-    width: max(245px, 100%);
-    justify-items: start;
-    align-items: center;
-    background-color: #ededed;
-    cursor: pointer;
-    padding: 8px;
-    transition: 0.4s;
-    border: solid 4px #b3b3b3;
-    border-bottom-width: 0px;
-    border-radius: 5px 5px 0 0;
-    gap: 16px;
+footer {
+	padding: var(--spacing-half);
+	gap: var(--spacing-half);
+	background-color: var(--color-primary);
 }
 
-.collapsible.active {
-    border-radius: 5px 5px 0 0;
-}
-
-button.collapsible::after {
-    content: '\276F';
-    transform: rotate(90deg);
-}
-
-button.collapsible.active::after {
-    content: '\276F';
-    transform: rotate(270deg);
-}
-
-button.collapsible > input[type=checkbox] {
-    height: 1.5rem;
-    width: 1.5rem;
-}
-
-.todo-font {
-    font-size: large;
-    font-weight: bold;
-}
-
-a:hover > img {
-    height: 1.75rem;
-}
-
-.todo-action-container {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    justify-content: flex-end;
-    width: 100%;
-    gap: 10px;    
-}
-
-.todo-content {
-    display: grid;
-    grid-template-columns: 15ch 1fr 15ch;
-    grid-template-rows: auto auto auto;       
-    overflow: hidden;
-    transition: max-height 0.2s ease-out;
-    border-radius: 0 0 5px 5px;
-    border: solid 2px #b3b3b3;
-    margin-bottom: 10px;
-    min-width: 241px;
-    max-height: 0;
-}
-
-.todo-content > span.todo-description-label {
-    grid-area: 1 / 1 / 2 / 2;
-    font-weight: bold;
-    padding: 10px;
-}
-
-.todo-content > span.todo-priority {
-    grid-area: 1 / 3 / 2 / 4;
-    justify-self: flex-end;
-    font-weight: bold;
-    padding: 10px;
-}
-
-.todo-content > span.todo-description {
-    grid-area: 2 / 1 / 3 / 4;
-    padding: 0 10px;
-}
-
-.todo-content > span.todo-last-modified {
-    grid-area: 3 / 1 / 4 / 4;
-    justify-self: flex-end;
-    font-size: small;
-    padding: 10px;
-}
-
-#footer {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 0.5rem;
-    gap: 0.5rem;
-    background-color: black;
-    color: #f9f9f9;
-}
-
-#footer > p {
-    margin: 0;
-}
-
-.icon {
-    height: 1.25rem;
-}
-
-#modal {
-    background-color: rgb(0 0 0 / 80%);
-    height: 100%;
-    width: 100%;
-    position: absolute;
-    top: 0;
-    z-index: 1000;
-    display: flex;
-    justify-content: center;
-    align-items: center;  
+footer>p {
+	margin: 0;
+	font-size: small;
 }
 
 form {
-    background-color: #f9f9f9;
-    width: min(400px, 75%);
-    min-width: 200px;
-    padding: 1em;
-    border: 2px solid black;
-    border-radius: 8px;
-    display: flex;
-    flex-direction: column;
-    flex-wrap: wrap;
-    gap: 12px;
+	background-color: var(--color-secondary);
+	margin: var(--spacing);
+	padding: var(--spacing);
+	gap: var(--spacing);
+	border: var(--standard-border);
+	border-radius: 8px;
+	display: flex;
+	flex-direction: column;
+	font-weight: bold;
+	width: 600px;
 }
 
-.close-form-button {
-    width: 1.5rem;
-    align-self: flex-end;
-    border: none;
-    background-color: initial;
+/* Generic css classes */
+.flex-center-center {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.grid-center-center {
+	display: grid;
+	justify-items: center;
+	align-items: center;
+}
+
+.font-large {
+	font-size: large;
+}
+
+.font-bold {
+	font-weight: bold;
+}
+
+.icon {
+	height: var(--icon-height-min);
+	width: var(--icon-width-min);
+}
+
+a>img.icon:hover {
+	height: var(--icon-height-max);
+	width: var(--icon-width-max);
+}
+
+.button {
+	background-color: var(--color-secondary);
+	border: var(--standard-border);
+	border-radius: 3px;
+	transition: 0.4s;
+}
+
+.button:hover,
+.collapsible:hover,
+.active {
+	background-color: #b3b3b3 !important;
+	cursor: pointer;
+}
+
+.button-text {
+	white-space: nowrap;
+	max-width: 100%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+/* CSS for sidebar elements (projects) */
+.add-buttons-container {
+	background-color: inherit;
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--spacing);
+	padding: var(--spacing);
+	padding-bottom: 0;
+	align-items: center;
+	justify-content: flex-start;
+}
+
+.add-button {
+	flex: 1 1 100px;
+	padding: var(--spacing);
+	height: var(--height);
+}
+
+#sidebarContainer>label {
+	padding: var(--spacing);
+	padding-bottom: 0;
+}
+
+#projectsContainer {
+	overflow-y: auto;
+	flex: 0 1 auto;
+	padding: var(--spacing);
+	scroll-snap-type: y mandatory;
+	scroll-padding: var(--spacing);
+}
+
+.project-button {
+	grid-template-columns: 1fr var(--icon-width-max) var(--icon-width-max);
+	height: var(--height);
+	width: 100%;
+	font-size: x-large;
+	margin-bottom: var(--spacing);
+	scroll-snap-align: start;
+	overflow-y: hidden;
+}
+
+.project-button:first-child {
+	grid-template-columns: 1fr;
+}
+
+.project-title {
+	justify-self: flex-start;
+}
+
+/* CSS for main elements (todos and todos contents) */
+.collapsible {
+	justify-items: start;
+	grid-template-columns: 1.5rem 3fr 15rem 1.5rem;
+	grid-template-rows: var(--height);
+	width: max(245px, 100%);
+	background-color: var(--color-secondary);
+	cursor: pointer;
+	padding: var(--spacing);
+	border: var(--standard-border);
+	transition: 0.4s;
+	border-width: 4px;
+	border-bottom-width: 0px;
+	border-radius: 5px 5px 0 0;
+	gap: var(--spacing);
+	scroll-snap-align: start;
+	overflow-y: hidden;
+}
+
+button.collapsible::after {
+	content: '\276F';
+	transform: rotate(90deg);
+}
+
+button.collapsible.active::after {
+	content: '\276F';
+	transform: rotate(270deg);
+}
+
+.todo-action-container {
+	width: 100%;
+	grid-template-columns: var(--icon-width-max) var(--icon-width-max) 1fr;
+	gap: var(--spacing);
+}
+
+.todo-due-date {
+	justify-self: flex-end;
+}
+
+.todo-content {
+	grid-template-columns: 15ch 1fr 20ch;
+	grid-template-rows: auto auto auto;
+	overflow: hidden;
+	transition: max-height 0.2s ease-out;
+	border-radius: 0 0 5px 5px;
+	border: var(--standard-border);
+	margin-bottom: var(--spacing);
+	min-width: 241px;
+	max-height: 0;
+}
+
+.todo-content>span.todo-description-label {
+	justify-self: flex-start;
+	grid-area: 1 / 1 / 2 / 2;
+	padding: var(--spacing);
+}
+
+.todo-content>span.todo-priority {
+	justify-self: flex-end;
+	grid-area: 1 / 3 / 2 / 4;
+	padding: var(--spacing);
+}
+
+.todo-content>span.todo-description {
+	justify-self: flex-start;
+	grid-area: 2 / 1 / 3 / 4;
+	padding: 0 var(--spacing);
+}
+
+.todo-content>span.todo-last-modified {
+	justify-self: flex-end;
+	grid-area: 3 / 1 / 4 / 4;
+	padding: var(--spacing);
+	font-size: small;
+}
+
+/* CSS for modals */
+.modal-background {
+	background-color: rgb(0 0 0 / 80%);
+	height: 100%;
+	width: 100%;
+	position: absolute;
+	top: 0;
+	z-index: 1000;
+}
+
+.close-button {
+	margin-left: auto;
 }
 
 .form-row {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 5px;
+	justify-content: flex-start;
+	flex-wrap: wrap;
+	gap: var(--spacing);
 }
 
-.form-row > input[type="text"] {
-    flex: auto;
+.form-row> :not(span) {
+	font-size: large;
 }
 
-.d-none {
-    display: none;
+.form-row>input {
+	flex: auto;
+}
+
+.form-row>textarea[type='text'] {
+	width: 100%;
+	resize: none;
+}
+
+#todoStatusContainer {
+	justify-content: space-between;
+	gap: var(--spacing);
+	flex-wrap: wrap;
 }
 
 @media screen and (max-width: 800px) {
-    .collapsible {
-        grid-template-rows: auto auto;
-        grid-template-areas:
-            "checkbox title chevron"
-            "checkbox action chevron";
-        grid-template-columns: 1.5rem 1fr 1.5rem;
-    }
+	.collapsible {
+		grid-template-rows: auto var(--height);
+		grid-template-areas:
+			'checkbox title chevron'
+			'checkbox action chevron';
+		grid-template-columns: 1.5rem 1fr 1.5rem;
+	}
 
-    .collapsible > input[type=checkbox] {
-        grid-area: checkbox;
-    }
+	.collapsible>input[type='checkbox'] {
+		grid-area: checkbox;
+	}
 
-    .collapsible > span {
-        grid-area: title;
-    }
+	.collapsible>span {
+		grid-area: title;
+	}
 
-    .collapsible > .todo-action-container {
-        grid-area: action;
-    }
-    
-    .collapsible::after {
-        grid-area: chevron;
-    }
-  }
+	.collapsible>.todo-action-container {
+		grid-area: action;
+	}
+
+	.collapsible::after {
+		grid-area: chevron;
+	}
+}
