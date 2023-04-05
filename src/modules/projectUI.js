@@ -89,7 +89,7 @@ export const ProjectUI = (() => {
 
 		const deleteProjectElement = getClickableIconElement(deleteIcon);
 		deleteProjectElement.addEventListener('click', () => {
-			TodoListStorage.removeProject(project.uuid);
+			UIActions.executeAction({ action: Action.DeleteProject }, project);
 			_addRemoveAnimation(projectButtonElement);
 		});
 
@@ -108,23 +108,6 @@ export const ProjectUI = (() => {
 		return projectButtonElement;
 	};
 
-	const updateProjectElement = (args, customObject = null) => {
-		switch (args.action) {
-			case Action.AddProject:
-				const projectsContainer =
-					document.querySelector('#projectsContainer');
-				const addProject = getProjectElement(customObject);
-				projectsContainer.appendChild(addProject);
-			case Action.UpdateProject:
-				if (args.button) {
-					const title = args.button.querySelector('.project-title');
-					title.textContent = customObject.title;
-				}
-			default:
-				return;
-		}
-	};
-
 	const showProjectElements = (projects = null, activeProjectUuid = '') => {
 		if (!projects) {
 			projects = TodoListStorage.get();
@@ -140,5 +123,5 @@ export const ProjectUI = (() => {
 		projectsContainer.appendChild(projectElements);
 	};
 
-	return { getProjectElement, updateProjectElement, showProjectElements };
+	return { getProjectElement, showProjectElements };
 })();

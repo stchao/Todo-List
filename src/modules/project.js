@@ -4,7 +4,7 @@ export const Project = (title = '', currentUuid = '') => {
 	return {
 		uuid: currentUuid || uuidv4(),
 		title,
-		lastModifiedInMS: Date.now(),
+		lastModifiedISO: new Date().toISOString(),
 		todos: {},
 	};
 };

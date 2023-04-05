@@ -1,8 +1,9 @@
-import { Action, UIActions } from './modules/uiActions';
 import githubIcon from './images/github-logo.png';
 import plusIcon from './images/plus.png';
+import { Action, UIActions } from './modules/uiActions';
 import { ProjectUI } from './modules/projectUI';
 import { TodoUI } from './modules/todoUI';
+import { showSieveElements } from './modules/sieveUI';
 
 export const getClickableIconElement = (imgSrc, classes = ['icon']) => {
 	const anchorElement = document.createElement('a');
@@ -62,8 +63,12 @@ const getMain = () => {
 	const todoElements = document.createElement('div');
 	todoElements.id = 'todosContainer';
 
+	const sieveElements = document.createElement('div');
+	sieveElements.id = 'sievesContainer';
+
 	const mainElement = document.createElement('div');
 	mainElement.id = 'mainContainer';
+	mainElement.appendChild(sieveElements);
 	mainElement.appendChild(todoElements);
 
 	return mainElement;
@@ -116,5 +121,6 @@ const getFooter = () => {
 	body.appendChild(bodyFragment);
 
 	ProjectUI.showProjectElements();
+	showSieveElements();
 	TodoUI.showTodoElements();
 })();

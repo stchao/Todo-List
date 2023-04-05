@@ -1,5 +1,6 @@
-import format from 'date-fns/format';
+import { formatWithoutTimezone } from './dateFormat';
 import { Priority } from './todo';
+import { format } from 'date-fns';
 
 export const TagId = {
 	title: 'titleInput',
@@ -195,7 +196,9 @@ export const Modal = (() => {
 			);
 			tempTitleAttributes.value = tempTodo.title;
 			tempDescriptionProperties.value = tempTodo.description;
-			tempDueDateAttributes.value = tempTodo.dueDate;
+			tempDueDateAttributes.value = formatWithoutTimezone(
+				tempTodo.dueDateISO
+			);
 			tempPriorityProperties.value = tempTodo.priority;
 			if (tempTodo.completed) {
 				tempCompletedAttributes.checked = '';

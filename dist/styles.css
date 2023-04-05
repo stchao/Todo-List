@@ -45,10 +45,8 @@ header {
 #mainContainer {
 	flex: 4;
 	background-color: var(--color-tertiary);
-	padding: var(--spacing);
-	overflow-y: auto;
-	scroll-snap-type: y mandatory;
-	scroll-padding-top: var(--spacing);
+	display: flex;
+	flex-direction: column;
 }
 
 footer {
@@ -102,6 +100,11 @@ form {
 }
 
 a>img.icon:hover {
+	cursor: pointer;
+}
+
+#todosContainer a>img.icon:hover,
+#projectsContainer a>img.icon:hover {
 	height: var(--icon-height-max);
 	width: var(--icon-width-max);
 }
@@ -177,6 +180,48 @@ a>img.icon:hover {
 }
 
 /* CSS for main elements (todos and todos contents) */
+#sievesContainer {
+	justify-content: space-between;
+	padding: var(--spacing);
+	flex-wrap: wrap;
+	gap: var(--spacing);
+}
+
+#filterContainer {
+	border: var(--standard-border);
+	background: var(--color-tertiary);
+	flex: 1 1 250px;
+	max-width: 300px;
+}
+
+#filterContainer input {
+	background: var(--color-tertiary);
+	border: none;
+	width: 100%;
+}
+
+#sortContainer select {
+	background: var(--color-tertiary);
+	border: var(--standard-border)
+}
+
+#filterContainer input:focus-visible,
+#sortContainer select:focus-visible {
+	outline: none;
+}
+
+#sortContainer {
+	gap: var(--spacing-half);
+}
+
+#todosContainer {
+	overflow-y: auto;
+	scroll-snap-type: y mandatory;
+	flex: 0 1 auto;
+	padding: var(--spacing);
+	padding-top: 0;
+}
+
 .collapsible {
 	justify-items: start;
 	grid-template-columns: 1.5rem 3fr 15rem 1.5rem;
@@ -314,5 +359,15 @@ button.collapsible.active::after {
 
 	.collapsible::after {
 		grid-area: chevron;
+	}
+}
+
+@media screen and (max-width: 650px) {
+	#sievesContainer {
+		justify-content: flex-end;
+	}
+
+	#filterContainer {
+		max-width: 100%;
 	}
 }

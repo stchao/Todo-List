@@ -51,7 +51,7 @@ export const TodoListStorage = (() => {
 
 	const updateProjectTitle = (project) => {
 		_local[project.uuid].title = project.title;
-		_local[project.uuid].lastModifiedInMS = project.lastModifiedInMS;
+		_local[project.uuid].lastModifiedISO = project.lastModifiedISO;
 		_set();
 	};
 

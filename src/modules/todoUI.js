@@ -4,6 +4,7 @@ import { TodoListStorage } from './todoListStorage';
 import { Action, UIActions } from './uiActions';
 import editIcon from '../images/pencil.png';
 import deleteIcon from '../images/delete.png';
+import { formatWithoutTimezone } from './dateFormat';
 
 export const TodoUI = (() => {
 	const _toggleTodoContent = (ev, contentElement) => {
@@ -77,19 +78,13 @@ export const TodoUI = (() => {
 		element.style.maxHeight = 0;
 	};
 
-	const _removeTodo = (uuid, todoButton = null, todoContent = null) => {
-		TodoListStorage.removeTodo(uuid);
-		_addRemoveButtonAnimation(todoButton);
-		_addRemoveContentAnimation(todoContent);
-	};
-
 	const _updateLastModified = (
 		ev,
-		lastModifiedInMS = Date.now(),
+		lastModifiedISO = new Date().toISOString(),
 		lastModified = null,
 		todoContent = null
 	) => {
-		const distanceToNow = formatDistanceToNow(new Date(lastModifiedInMS));
+		const distanceToNow = formatDistanceToNow(new Date(lastModifiedISO));
 		lastModified.innerText = `Last Updated: ${distanceToNow} ago`;
 		_toggleTodoContent(ev, todoContent);
 	};
@@ -119,7 +114,7 @@ export const TodoUI = (() => {
 		todoButton.addEventListener('click', (ev) => {
 			_updateLastModified(
 				ev,
-				todo.lastModifiedInMS,
+				todo.lastModifiedISO,
 				lastModified,
 				todoContent
 			);
@@ -130,9 +125,8 @@ export const TodoUI = (() => {
 
 	const _getTodoActionContainer = (todo, todoButton, todoContent) => {
 		const todoActionContainer = document.createElement('div');
-		const dueDate = todo.dueDate || 'N/A';
+		const dueDate = formatWithoutTimezone(todo.dueDateISO);
 		const dueDateElement = _getSpan(`Due: ${dueDate}`, 'todo-due-date');
-
 		const editTodoElement = getClickableIconElement(editIcon);
 		editTodoElement.addEventListener('click', () => {
 			UIActions.showModal(
@@ -145,9 +139,12 @@ export const TodoUI = (() => {
 
 		const deleteTodoElement = getClickableIconElement(deleteIcon);
 		deleteTodoElement.addEventListener('click', () => {
-			_removeTodo(todo.uuid, todoButton, todoContent);
+			UIActions.executeAction({ action: Action.DeleteTodo }, todo);
+			_addRemoveButtonAnimation(todoButton);
+			_addRemoveContentAnimation(todoContent);
 		});
 
+		dueDateElement.dataset.dueDateIso = todo.dueDateISO;
 		todoActionContainer.classList.add(
 			'grid-center-center',
 			'todo-action-container'
@@ -182,12 +179,14 @@ export const TodoUI = (() => {
 			'font-bold',
 		]);
 		const distanceToNow = formatDistanceToNow(
-			new Date(todo.lastModifiedInMS)
+			new Date(todo.lastModifiedISO)
 		);
 		const lastModified = _getSpan(
 			`Last Updated: ${distanceToNow} ago`,
 			'todo-last-modified'
 		);
+
+		lastModified.dataset.lastModifiedIso = todo.lastModifiedISO;
 		todoContent.classList.add('grid-center-center', 'todo-content');
 		todoContent.appendChild(lastModified);
 		todoContent.appendChild(descriptionLabel);
@@ -215,53 +214,6 @@ export const TodoUI = (() => {
 		return todoFragment;
 	};
 
-	const updateTodoElement = (args, customObject = null) => {
-		switch (args.action) {
-			case Action.AddTodo:
-				const todosContainer =
-					document.querySelector('#todosContainer');
-				const addTodo = getTodoElement(customObject);
-				todosContainer.appendChild(addTodo);
-				break;
-			case Action.UpdateTodo:
-				const button = args.button;
-				const buttonContent = args.buttonContent;
-
-				if (button) {
-					const completed = button.querySelector('.todo-completed');
-					const title = button.querySelector('.todo-title');
-					const dueDate = button.querySelector('.todo-due-date');
-					const dueDateText = customObject.dueDate || 'N/A';
-					completed.checked = customObject.completed;
-					title.textContent = customObject.title;
-					dueDate.textContent = `Due: ${dueDateText}`;
-				}
-
-				if (buttonContent) {
-					const description =
-						buttonContent.querySelector('.todo-description');
-					const priority =
-						buttonContent.querySelector('.todo-priority');
-					const distanceToNow = formatDistanceToNow(
-						new Date(customObject.lastModifiedInMS)
-					);
-					const lastModified = buttonContent.querySelector(
-						'.todo-last-modified'
-					);
-					description.textContent = customObject.description;
-					priority.textContent = `Priority: ${customObject.priority}`;
-					lastModified.textContent = `Last Updated: ${distanceToNow} ago`;
-					buttonContent.style.maxHeight = buttonContent.style
-						.maxHeight
-						? buttonContent.scrollHeight + 'px'
-						: null;
-				}
-				break;
-			default:
-				return;
-		}
-	};
-
 	const showTodoElements = (todos = null) => {
 		if (!todos) {
 			const currentProject = TodoListStorage.getActiveProject();
@@ -274,5 +226,5 @@ export const TodoUI = (() => {
 		todosContainer.appendChild(todoElements);
 	};
 
-	return { getTodoElement, updateTodoElement, showTodoElements };
+	return { getTodoElement, showTodoElements };
 })();
