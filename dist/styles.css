@@ -130,6 +130,10 @@ a>img.icon:hover {
 	text-overflow: ellipsis;
 }
 
+.d-none {
+	display: none;
+}
+
 /* CSS for sidebar elements (projects) */
 .add-buttons-container {
 	background-color: inherit;

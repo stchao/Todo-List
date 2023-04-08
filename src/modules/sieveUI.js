@@ -11,7 +11,15 @@ import { Action, UIActions } from './uiActions';
 
 const _getFilterInput = () => {
 	const filter = document.createElement('input');
+	filter.placeholder = 'Begin typing to filter';
 	filter.type = 'text';
+	filter.addEventListener('input', (ev) => {
+		setTimeout(UIActions.executeAction, 250, {
+			action: Action.RunFilter,
+			filterText: ev.target.value,
+			filterInput: ev.target,
+		});
+	});
 	return filter;
 };
 

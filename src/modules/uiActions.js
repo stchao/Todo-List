@@ -16,6 +16,7 @@ export const Action = {
 	DeleteProject: 5,
 	UpdateSort: 6,
 	RunSort: 7,
+	RunFilter: 8,
 };
 
 export const UIActions = (() => {
@@ -225,6 +226,39 @@ export const UIActions = (() => {
 		return 0;
 	};
 
+	const _filterTodo = (filterText = '', filterInput = null) => {
+		if (filterText !== filterInput?.value) {
+			return;
+		}
+
+		const todosContainer = document.querySelector('#todosContainer');
+		const todos = [...(todosContainer?.querySelectorAll('button') ?? [])];
+
+		todos.forEach((todo) => {
+			let todoContent = todo.nextElementSibling;
+
+			if (todoContent?.tagName !== 'DIV') {
+				todoContent = null;
+			}
+
+			const todoTexts = todo.querySelectorAll('span');
+			const todoContentTexts =
+				todoContent?.querySelectorAll('span') ?? [];
+			const spansToScan = [...todoTexts, ...todoContentTexts];
+			const isFilterFound = spansToScan.some((span) =>
+				span.innerText.toLowerCase().includes(filterText.toLowerCase())
+			);
+
+			todo.classList.remove('d-none');
+			todoContent?.classList.remove('d-none');
+
+			if (!isFilterFound && filterText) {
+				todo.classList.add('d-none');
+				todoContent?.classList.add('d-none');
+			}
+		});
+	};
+
 	const executeAction = (args, customObject = null) => {
 		const title =
 			document.querySelector(`#${TagId.title}`)?.value ||
@@ -274,6 +308,9 @@ export const UIActions = (() => {
 					args.isAscending ?? true,
 					args.selector || 'div.todo-content'
 				);
+				return;
+			case Action.RunFilter:
+				_filterTodo(args.filterText, args.filterInput);
 				return;
 			default:
 				return;
