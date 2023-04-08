@@ -1,3 +1,5 @@
+import menuIconClosed from '../images/menu.png';
+import menuIconOpen from '../images/menu-open.png';
 import { TodoListStorage } from './todoListStorage';
 import { Modal, TagId } from './modal';
 import { TodoUI } from './todoUI';
@@ -362,19 +364,27 @@ export const UIActions = (() => {
 		container.appendChild(modal);
 	};
 
-	const getAddButton = (action) => {
-		const addButtonElement = document.createElement('button');
-		addButtonElement.classList.add(
-			'flex-center-center',
-			'add-button',
-			'button',
-			'font-bold'
-		);
-		addButtonElement.addEventListener('click', () => {
-			showModal(action);
-		});
-		return addButtonElement;
+	const toggleSidebar = () => {
+		const menuIcon = document.querySelector('#menuIcon');
+		const menuIconStyles = window.getComputedStyle(menuIcon);
+
+		if (menuIconStyles.display === 'none') {
+			return;
+		}
+
+		const menuIconImg = menuIcon.querySelector('img');
+		const sidebarContainer = document.querySelector('#sidebarContainer');
+		sidebarContainer?.classList.toggle('sidebar-display');
+		menuIconImg.src = sidebarContainer?.classList.contains(
+			'sidebar-display'
+		)
+			? menuIconClosed
+			: menuIconOpen;
 	};
 
-	return { executeAction, showModal, getAddButton };
+	return {
+		executeAction,
+		showModal,
+		toggleSidebar,
+	};
 })();

@@ -24,6 +24,7 @@ export const ProjectUI = (() => {
 		siblings.forEach((sibling) => sibling.classList.remove('active'));
 		targetElement.classList.add('active');
 		TodoUI.showTodoElements();
+		UIActions.toggleSidebar();
 	};
 
 	const _getSpan = (text, classes) => {

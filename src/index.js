@@ -1,5 +1,6 @@
 import githubIcon from './images/github-logo.png';
 import plusIcon from './images/plus.png';
+import menuIconClosed from './images/menu.png';
 import { Action, UIActions } from './modules/uiActions';
 import { ProjectUI } from './modules/projectUI';
 import { TodoUI } from './modules/todoUI';
@@ -14,9 +15,33 @@ export const getClickableIconElement = (imgSrc, classes = ['icon']) => {
 	return anchorElement;
 };
 
+const getAddButton = (action) => {
+	const addButtonElement = document.createElement('button');
+	addButtonElement.classList.add(
+		'flex-center-center',
+		'add-button',
+		'button',
+		'font-bold'
+	);
+	addButtonElement.addEventListener('click', () => {
+		UIActions.showModal(action);
+	});
+	return addButtonElement;
+};
+
+const getMenuIcon = (imgSrc, classes = ['icon']) => {
+	const menuIcon = getClickableIconElement(imgSrc, classes);
+	menuIcon.addEventListener('click', UIActions.toggleSidebar);
+	return menuIcon;
+};
+
 const getHeader = () => {
 	const headingElement = document.createElement('h1');
-	headingElement.innerText = 'Todo List';
+	const headingText = document.createTextNode('Todo List');
+	const menu = getMenuIcon(menuIconClosed);
+	menu.id = 'menuIcon';
+	menu.classList.add('menu-display');
+	headingElement.append(headingText, menu);
 
 	const headerElement = document.createElement('header');
 	headerElement.appendChild(headingElement);
@@ -29,12 +54,12 @@ const getSidebar = () => {
 	imgIconElement.classList.add('icon');
 
 	const projectTextElement = document.createTextNode('Project');
-	const addProjectButtonElement = UIActions.getAddButton(Action.AddProject);
+	const addProjectButtonElement = getAddButton(Action.AddProject);
 	addProjectButtonElement.appendChild(imgIconElement);
 	addProjectButtonElement.appendChild(projectTextElement);
 
 	const todoTextElement = document.createTextNode('Todo');
-	const addTodoButtonElement = UIActions.getAddButton(Action.AddTodo);
+	const addTodoButtonElement = getAddButton(Action.AddTodo);
 	addTodoButtonElement.appendChild(imgIconElement.cloneNode(true));
 	addTodoButtonElement.appendChild(todoTextElement);
 
@@ -52,6 +77,7 @@ const getSidebar = () => {
 
 	const sidebarElement = document.createElement('div');
 	sidebarElement.id = 'sidebarContainer';
+	sidebarElement.classList.add('sidebar-display');
 	sidebarElement.appendChild(addButtonsContainer);
 	sidebarElement.appendChild(projectLabelElement);
 	sidebarElement.appendChild(projectElement);

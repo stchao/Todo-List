@@ -31,6 +31,7 @@ header {
 
 #content {
 	display: flex;
+	flex-wrap: wrap;
 	flex: 1;
 	overflow: hidden;
 }
@@ -131,6 +132,19 @@ a>img.icon:hover {
 }
 
 .d-none {
+	display: none !important;
+}
+
+/* CSS for heading */
+header>h1 {
+	padding: 0 var(--spacing);
+}
+
+#menuIcon {
+	float: right;
+}
+
+.menu-display {
 	display: none;
 }
 
@@ -257,7 +271,7 @@ button.collapsible.active::after {
 .todo-action-container {
 	width: 100%;
 	grid-template-columns: var(--icon-width-max) var(--icon-width-max) 1fr;
-	gap: var(--spacing);
+	gap: var(--spacing-half);
 }
 
 .todo-due-date {
@@ -265,8 +279,6 @@ button.collapsible.active::after {
 }
 
 .todo-content {
-	grid-template-columns: 15ch 1fr 20ch;
-	grid-template-rows: auto auto auto;
 	overflow: hidden;
 	transition: max-height 0.2s ease-out;
 	border-radius: 0 0 5px 5px;
@@ -341,6 +353,8 @@ button.collapsible.active::after {
 }
 
 @media screen and (max-width: 800px) {
+
+	/* CSS for main elements (todos and todos contents) */
 	.collapsible {
 		grid-template-rows: auto var(--height);
 		grid-template-areas:
@@ -367,6 +381,27 @@ button.collapsible.active::after {
 }
 
 @media screen and (max-width: 650px) {
+
+	/* CSS for heading */
+	.menu-display {
+		display: block !important;
+	}
+
+	/* Main containers css */
+	#sidebarContainer {
+		max-height: 100%;
+		width: 100%;
+	}
+
+	.sidebar-display {
+		display: none !important;
+	}
+
+	#mainContainer {
+		max-height: 100%;
+	}
+
+	/* CSS for main elements (todos and todos contents) */
 	#sievesContainer {
 		justify-content: flex-end;
 	}
