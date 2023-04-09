@@ -42,6 +42,7 @@ header {
 	width: max(150px, 20%);
 	display: flex;
 	flex-direction: column;
+	gap: var(--spacing);
 }
 
 #mainContainer {
@@ -169,16 +170,25 @@ header>h1 {
 }
 
 #sidebarContainer>label {
-	padding: var(--spacing);
-	padding-bottom: 0;
+	padding: 0 var(--spacing);
+}
+
+#projectFilterContainer {
+	border: var(--standard-border);
+	margin: 0 var(--spacing);
+}
+
+#projectFilterContainer input {
+	background: var(--color-secondary);
+	border: none;
+	width: 100%;
 }
 
 #projectsContainer {
 	overflow-y: auto;
 	flex: 0 1 auto;
-	padding: var(--spacing);
+	padding: 0 var(--spacing);
 	scroll-snap-type: y mandatory;
-	scroll-padding: var(--spacing);
 }
 
 .project-button {
@@ -207,14 +217,14 @@ header>h1 {
 	gap: var(--spacing);
 }
 
-#filterContainer {
+#todoFilterContainer {
 	border: var(--standard-border);
 	background: var(--color-tertiary);
 	flex: 1 1 250px;
 	max-width: 300px;
 }
 
-#filterContainer input {
+#todoFilterContainer input {
 	background: var(--color-tertiary);
 	border: none;
 	width: 100%;
@@ -225,8 +235,9 @@ header>h1 {
 	border: var(--standard-border)
 }
 
-#filterContainer input:focus-visible,
-#sortContainer select:focus-visible {
+#todoFilterContainer input:focus-visible,
+#sortContainer select:focus-visible,
+#projectFilterContainer input:focus-visible {
 	outline: none;
 }
 
