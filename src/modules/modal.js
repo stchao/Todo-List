@@ -79,8 +79,11 @@ export const Modal = (() => {
 		actionButton.classList.add('button');
 		actionButton.textContent = actionLabel || 'Button';
 		actionButton.addEventListener('click', () => {
-			actionFunction(args, tempObject);
-			modalContainer?.remove();
+			const showValidation = actionFunction(args, tempObject);
+			// actionFunction returns true when validation message is being displayed
+			if (!showValidation) {
+				modalContainer?.remove();
+			}
 		});
 
 		modalContainer.classList.add('flex-center-center', 'modal-background');
@@ -244,5 +247,20 @@ export const Modal = (() => {
 		);
 	};
 
-	return { getFormItem, getProjectForm, getTodoForm };
+	const setValidationMessage = (element, message = '') => {
+		const elementContainer = element?.parentElement;
+		const span = document.createElement('span');
+		span.textContent = message;
+		elementContainer?.insertAdjacentElement('afterend', span);
+
+		element?.addEventListener(
+			'input',
+			() => {
+				span?.remove();
+			},
+			{ once: true }
+		);
+	};
+
+	return { getFormItem, getProjectForm, getTodoForm, setValidationMessage };
 })();

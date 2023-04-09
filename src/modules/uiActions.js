@@ -262,9 +262,8 @@ export const UIActions = (() => {
 	};
 
 	const executeAction = (args, customObject = null) => {
-		const title =
-			document.querySelector(`#${TagId.title}`)?.value ||
-			new Date().toLocaleString();
+		const titleElement = document.querySelector(`#${TagId.title}`);
+		const title = titleElement?.value || new Date().toLocaleString();
 		const description =
 			document.querySelector(`#${TagId.description}`)?.value || '';
 		const dueDate =
@@ -292,6 +291,14 @@ export const UIActions = (() => {
 				TodoListStorage.removeTodo(customObject.uuid);
 				break;
 			case Action.AddProject:
+				if (title.toLowerCase() === 'default') {
+					Modal.setValidationMessage(
+						titleElement,
+						"Cannot use the reserved word 'Default' for the project title."
+					);
+					return true;
+				}
+
 				customObject = TodoListStorage.addProject();
 			case Action.UpdateProject:
 				customObject.title = title;

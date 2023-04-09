@@ -38,6 +38,7 @@ header {
 
 #sidebarContainer {
 	background-color: var(--color-secondary);
+	height: 100%;
 	width: max(150px, 20%);
 	display: flex;
 	flex-direction: column;
@@ -48,6 +49,7 @@ header {
 	background-color: var(--color-tertiary);
 	display: flex;
 	flex-direction: column;
+	height: 100%;
 }
 
 footer {
@@ -389,16 +391,11 @@ button.collapsible.active::after {
 
 	/* Main containers css */
 	#sidebarContainer {
-		max-height: 100%;
 		width: 100%;
 	}
 
 	.sidebar-display {
 		display: none !important;
-	}
-
-	#mainContainer {
-		max-height: 100%;
 	}
 
 	/* CSS for main elements (todos and todos contents) */
