@@ -9,20 +9,6 @@ import sortClockDesc from '../images/sort-clock-desc.png';
 import search from '../images/search.png';
 import { Action, UIActions } from './uiActions';
 
-const _getFilterInput = () => {
-	const filter = document.createElement('input');
-	filter.placeholder = 'Begin typing to filter';
-	filter.type = 'text';
-	filter.addEventListener('input', (ev) => {
-		setTimeout(UIActions.executeAction, 250, {
-			action: Action.RunFilter,
-			filterText: ev.target.value,
-			filterInput: ev.target,
-		});
-	});
-	return filter;
-};
-
 const _getSelect = () => {
 	const selectContainer = document.createDocumentFragment();
 	const label = document.createElement('label');
@@ -49,25 +35,46 @@ const _getSelect = () => {
 	return selectContainer;
 };
 
-const _getAllSieveElements = () => {
+const _getFilterInput = (action) => {
+	const filter = document.createElement('input');
+	filter.placeholder = 'Begin typing to filter';
+	filter.type = 'text';
+	filter.addEventListener('input', (ev) => {
+		setTimeout(UIActions.executeAction, 250, {
+			action: action,
+			filterText: ev.target.value,
+			filterInput: ev.target,
+		});
+	});
+	return filter;
+};
+
+export const getTodoSieveElements = () => {
 	const sieveElements = document.createDocumentFragment();
-	const filterContainer = document.createElement('div');
+	const filterContainer = getFilterContainer(Action.RunTodoFilter);
 	const sortContainer = document.createElement('div');
-	const filterIcon = document.createElement('img');
-	const filterInput = _getFilterInput();
 	const select = _getSelect();
 	const sortIcon = getSortIcon(SortAction.SortByCompleted);
 
-	filterIcon.src = search;
-	filterIcon.classList.add('icon');
-	filterContainer.id = 'filterContainer';
+	filterContainer.id = 'todoFilterContainer';
 	filterContainer.classList.add('flex-center-center');
-	filterContainer.append(filterIcon, filterInput);
 	sortContainer.id = 'sortContainer';
 	sortContainer.classList.add('flex-center-center');
 	sortContainer.append(select, sortIcon);
 	sieveElements.append(sortContainer, filterContainer);
 	return sieveElements;
+};
+
+export const getFilterContainer = (action) => {
+	const filterContainer = document.createElement('div');
+	const filterInput = _getFilterInput(action);
+	const filterIcon = document.createElement('img');
+
+	filterIcon.src = search;
+	filterIcon.classList.add('icon');
+	filterContainer.append(filterIcon, filterInput);
+
+	return filterContainer;
 };
 
 export const SortAction = {
@@ -77,14 +84,6 @@ export const SortAction = {
 	SortByDueDate: 'Due Date',
 	SortByPriority: 'Priority',
 	SortByLastModified: 'Last Modified',
-};
-
-export const showSieveElements = () => {
-	const sievesContainer = document.querySelector('#sievesContainer');
-	const sieveElements = _getAllSieveElements();
-	sievesContainer.classList.add('flex-center-center');
-	sievesContainer.textContent = '';
-	sievesContainer.appendChild(sieveElements);
 };
 
 export const getSortIcon = (sortAction, isAscending = true) => {
@@ -119,7 +118,7 @@ export const getSortIcon = (sortAction, isAscending = true) => {
 
 	icon.addEventListener('click', () => {
 		UIActions.executeAction({
-			action: Action.RunSort,
+			action: Action.RunTodoSort,
 			sortAction,
 			isAscending,
 			selector,

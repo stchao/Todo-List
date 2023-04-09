@@ -4,7 +4,7 @@ import menuIconClosed from './images/menu.png';
 import { Action, UIActions } from './modules/uiActions';
 import { ProjectUI } from './modules/projectUI';
 import { TodoUI } from './modules/todoUI';
-import { showSieveElements } from './modules/sieveUI';
+import { getFilterContainer, getTodoSieveElements } from './modules/sieveUI';
 
 export const getClickableIconElement = (imgSrc, classes = ['icon']) => {
 	const anchorElement = document.createElement('a');
@@ -72,15 +72,22 @@ const getSidebar = () => {
 	projectLabelElement.innerText = 'Projects:';
 	projectLabelElement.classList.add('font-large', 'font-bold');
 
+	const projectFilterElement = getFilterContainer(Action.RunProjectFilter);
+	projectFilterElement.id = 'projectFilterContainer';
+	projectFilterElement.classList.add('flex-center-center');
+
 	const projectElement = document.createElement('div');
 	projectElement.id = 'projectsContainer';
 
 	const sidebarElement = document.createElement('div');
 	sidebarElement.id = 'sidebarContainer';
 	sidebarElement.classList.add('sidebar-display');
-	sidebarElement.appendChild(addButtonsContainer);
-	sidebarElement.appendChild(projectLabelElement);
-	sidebarElement.appendChild(projectElement);
+	sidebarElement.append(
+		addButtonsContainer,
+		projectLabelElement,
+		projectFilterElement,
+		projectElement
+	);
 
 	return sidebarElement;
 };
@@ -89,12 +96,15 @@ const getMain = () => {
 	const todoElements = document.createElement('div');
 	todoElements.id = 'todosContainer';
 
-	const sieveElements = document.createElement('div');
-	sieveElements.id = 'sievesContainer';
+	const sievesContainer = document.createElement('div');
+	const sieveElements = getTodoSieveElements();
+	sievesContainer.id = 'sievesContainer';
+	sievesContainer.classList.add('flex-center-center');
+	sievesContainer.appendChild(sieveElements);
 
 	const mainElement = document.createElement('div');
 	mainElement.id = 'mainContainer';
-	mainElement.appendChild(sieveElements);
+	mainElement.appendChild(sievesContainer);
 	mainElement.appendChild(todoElements);
 
 	return mainElement;
@@ -147,6 +157,5 @@ const getFooter = () => {
 	body.appendChild(bodyFragment);
 
 	ProjectUI.showProjectElements();
-	showSieveElements();
 	TodoUI.showTodoElements();
 })();

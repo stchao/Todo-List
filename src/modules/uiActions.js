@@ -17,8 +17,9 @@ export const Action = {
 	UpdateProject: 4,
 	DeleteProject: 5,
 	UpdateSort: 6,
-	RunSort: 7,
-	RunFilter: 8,
+	RunTodoSort: 7,
+	RunTodoFilter: 8,
+	RunProjectFilter: 9,
 };
 
 export const UIActions = (() => {
@@ -261,6 +262,30 @@ export const UIActions = (() => {
 		});
 	};
 
+	const _filterProject = (filterText = '', filterInput = null) => {
+		if (filterText !== filterInput?.value) {
+			return;
+		}
+
+		const projectsContainer = document.querySelector('#projectsContainer');
+		const projects = [
+			...(projectsContainer?.querySelectorAll('button') ?? []),
+		];
+
+		projects.forEach((project) => {
+			const span = project.querySelector('span');
+			const isFilterFound = span?.innerText
+				.toLowerCase()
+				.includes(filterText.toLowerCase());
+
+			project.classList.remove('d-none');
+
+			if (!span || (!isFilterFound && filterText)) {
+				project.classList.add('d-none');
+			}
+		});
+	};
+
 	const executeAction = (args, customObject = null) => {
 		const titleElement = document.querySelector(`#${TagId.title}`);
 		const title = titleElement?.value || new Date().toLocaleString();
@@ -311,15 +336,18 @@ export const UIActions = (() => {
 			case Action.UpdateSort:
 				_updateSortIcon(args.sortAction, args.isAscending ?? true);
 				return;
-			case Action.RunSort:
+			case Action.RunTodoSort:
 				_sortTodo(
 					args.sortAction,
 					args.isAscending ?? true,
 					args.selector || 'div.todo-content'
 				);
 				return;
-			case Action.RunFilter:
+			case Action.RunTodoFilter:
 				_filterTodo(args.filterText, args.filterInput);
+				return;
+			case Action.RunProjectFilter:
+				_filterProject(args.filterText, args.filterInput);
 				return;
 			default:
 				return;
